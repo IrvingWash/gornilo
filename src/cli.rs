@@ -16,6 +16,8 @@ enum Commands {
         name: String,
         #[arg(long)]
         no_git: Option<bool>,
+        #[arg(long)]
+        no_ols: Option<bool>,
     },
     Build,
     Run,
@@ -27,8 +29,16 @@ impl Cli {
 
         if let Some(command) = args.command {
             match command {
-                Commands::New { name, no_git } => {
-                    project_creator::create_project(&name, no_git.unwrap_or_default());
+                Commands::New {
+                    name,
+                    no_git,
+                    no_ols,
+                } => {
+                    project_creator::create_project(
+                        &name,
+                        no_git.unwrap_or_default(),
+                        no_ols.unwrap_or_default(),
+                    );
                 }
                 Commands::Build => println!("`build` is not supported yet"),
                 Commands::Run => println!("`run` is not supported yet"),
