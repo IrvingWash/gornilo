@@ -1,6 +1,6 @@
 use std::fs::File;
 use std::io::Write;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{env, fs};
 
@@ -10,7 +10,7 @@ mod odin_code_generator;
 mod ols_config_generator;
 
 // TODO: replace with a proper config generator
-const GORNILO_CONFIG_CONTENTS: &'static str = r#"[project]
+const GORNILO_CONFIG_CONTENTS: &str = r#"[project]
 name = "$project_name$"
 "#;
 
@@ -76,7 +76,7 @@ fn init_git(project_dir_path: &PathBuf) {
 }
 
 fn create_project_structure(
-    project_dir_path: &PathBuf,
+    project_dir_path: &Path,
     project_name: &str,
     no_ols: bool,
     no_mem_tracking: bool,

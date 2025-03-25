@@ -1,4 +1,4 @@
-pub const OLS_CONFING_CONTENTS: &'static str = r#"{
+pub const OLS_CONFING_CONTENTS: &str = r#"{
 	"$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/misc/ols.schema.json",
 	"enable_format": true,
 	"enable_semantic_tokens": true,
@@ -8,7 +8,7 @@ pub const OLS_CONFING_CONTENTS: &'static str = r#"{
 }
 "#;
 
-pub const ODINFMT_CONFING_CONTENTS: &'static str = r#"{
+pub const ODINFMT_CONFING_CONTENTS: &str = r#"{
 	"$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/misc/odinfmt.schema.json",
 	"character_width": 80,
 	"newline_limit": 1,

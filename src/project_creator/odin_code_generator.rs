@@ -1,4 +1,4 @@
-pub const BASIC_CODE: &'static str = r#"package main
+pub const BASIC_CODE: &str = r#"package main
 
 import "core:fmt"
 
@@ -7,7 +7,7 @@ main :: proc() {
 }
 "#;
 
-pub const MEM_TRACKING_CODE: &'static str = r#"package main
+pub const MEM_TRACKING_CODE: &str = r#"package main
 
 @(require) import "core:fmt"
 @(require) import "core:log"

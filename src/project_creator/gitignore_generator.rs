@@ -1,3 +1,3 @@
-pub const GITIGNORE_CONTENTS: &'static str = r#"build
+pub const GITIGNORE_CONTENTS: &str = r#"build
 .DS_Store
 "#;

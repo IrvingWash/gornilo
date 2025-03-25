@@ -1,4 +1,4 @@
-pub const GITHUB_WORKFLOW_CONTENTS: &'static str = r#"name: Odin
+pub const GITHUB_WORKFLOW_CONTENTS: &str = r#"name: Odin
 
 on:
   push:
