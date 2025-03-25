@@ -1,7 +1,7 @@
 use clap::{Parser, Subcommand};
 
 use crate::{
-    project_buider,
+    gornilo_config, project_buider,
     project_creator::{self, CreateProjectParams},
 };
 
@@ -10,6 +10,9 @@ use crate::{
 pub struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
+
+    #[arg(long, short)]
+    verbose: bool,
 }
 
 #[derive(Subcommand)]
@@ -66,11 +69,17 @@ impl Cli {
                 Commands::Build {
                     release,
                     example: _,
-                } => project_buider::build_project(release, false),
+                } => {
+                    let config = gornilo_config::parse_config();
+                    project_buider::build_project(release, false, config);
+                }
                 Commands::Run {
                     release,
                     example: _,
-                } => project_buider::build_project(release, true),
+                } => {
+                    let config = gornilo_config::parse_config();
+                    project_buider::build_project(release, true, config);
+                }
                 Commands::Clean => project_buider::clean_project(),
             }
         }

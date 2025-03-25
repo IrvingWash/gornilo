@@ -4,15 +4,12 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::{env, fs};
 
+use crate::gornilo_config::GorniloConfig;
+
 mod github_workflow_generator;
 mod gitignore_generator;
 mod odin_code_generator;
 mod ols_config_generator;
-
-// TODO: replace with a proper config generator
-const GORNILO_CONFIG_CONTENTS: &str = r#"[project]
-name = "$project_name$"
-"#;
 
 pub struct CreateProjectParams {
     pub name: String,
@@ -108,8 +105,8 @@ fn create_project_structure(
 
         config_file
             .write_all(
-                GORNILO_CONFIG_CONTENTS
-                    .replace("$project_name$", project_name) // TODO: replace with proper config generator
+                toml::to_string_pretty(&GorniloConfig::default(project_name))
+                    .unwrap()
                     .as_bytes(),
             )
             .expect("Failed to write Gornilo config contents");

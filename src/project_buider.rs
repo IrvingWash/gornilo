@@ -3,10 +3,10 @@ use std::{
     process::{self, Command},
 };
 
-use crate::helpers;
+use crate::{gornilo_config::GorniloConfig, helpers};
 
 #[inline]
-pub fn build_project(release: bool, run: bool) {
+pub fn build_project(release: bool, run: bool, config: GorniloConfig) {
     if !helpers::is_in_project_dir() {
         eprintln!("The build command should be called from the project's root");
         process::exit(1);
@@ -25,13 +25,35 @@ pub fn build_project(release: bool, run: bool) {
         .arg(if run { "run" } else { "build" })
         .arg(souce_dir);
 
+    if config.vet_flags.warnings_as_errors {
+        odin_command.arg("-warnings-as-errors");
+    }
+    if config.vet_flags.unused_variables {
+        odin_command.arg("-vet-unused-variables");
+    }
+    if config.vet_flags.unused_imports {
+        odin_command.arg("-vet-unused-imports");
+    }
+    if config.vet_flags.tabs {
+        odin_command.arg("-vet-tabs");
+    }
+    if config.vet_flags.style {
+        odin_command.arg("-vet-style");
+    }
+    if config.vet_flags.semicolon {
+        odin_command.arg("-vet-semicolon");
+    }
+    if config.vet_flags.cast {
+        odin_command.arg("-vet-cast");
+    }
+
     if !release {
         odin_command.arg("-debug");
     } else {
         odin_command.arg("-no-bounds-check").arg("-o:speed");
     }
 
-    let build_file = build_dir.join("exe.out");
+    let build_file = build_dir.join(config.project.name);
 
     odin_command.arg(format!("-out:{}", build_file.to_str().unwrap()));
 
