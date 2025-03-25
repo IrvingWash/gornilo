@@ -18,7 +18,10 @@ main :: proc() {
 
 "#;
 
-const GORNILO_CONFIG_CONTENTS: &'static str = r#"[test]"#;
+// TODO: replace with a proper config generator
+const GORNILO_CONFIG_CONTENTS: &'static str = r#"[project]
+name = $project_name$
+"#;
 
 const OLS_CONFING_CONTENTS: &'static str = r#"{
 	"$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/misc/ols.schema.json",
@@ -49,7 +52,7 @@ pub fn create_project(name: &str, no_git: bool, no_ols: bool) {
         init_git(&project_dir_path);
     }
 
-    create_project_structure(&project_dir_path, no_ols);
+    create_project_structure(&project_dir_path, name, no_ols);
 
     println!("Finished");
 }
@@ -79,7 +82,7 @@ fn init_git(project_dir_path: &PathBuf) {
         .expect("Failed to write into .gitignore");
 }
 
-fn create_project_structure(project_dir_path: &PathBuf, no_ols: bool) {
+fn create_project_structure(project_dir_path: &PathBuf, project_name: &str, no_ols: bool) {
     // Main file
     {
         let src_path = project_dir_path.join("src");
@@ -100,7 +103,11 @@ fn create_project_structure(project_dir_path: &PathBuf, no_ols: bool) {
             .expect("Failed to create Gornilo config file");
 
         config_file
-            .write_all(GORNILO_CONFIG_CONTENTS.as_bytes())
+            .write_all(
+                GORNILO_CONFIG_CONTENTS
+                    .replace("$project_name$", project_name) // TODO: replace with proper config generator
+                    .as_bytes(),
+            )
             .expect("Failed to write Gornilo config contents");
     }
 
