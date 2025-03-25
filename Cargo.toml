@@ -2,6 +2,7 @@
 name = "gornilo"
 version = "0.1.0"
 edition = "2024"
+description = "Odin build tool"
 
 [dependencies]
 clap = { version = "4.5.32", features = ["derive"] }

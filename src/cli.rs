@@ -12,12 +12,12 @@ pub struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     New {
-        #[arg(value_name = "project name")]
+        #[arg(value_name = "PROJECT NAME")]
         name: String,
         #[arg(long)]
-        no_git: Option<bool>,
+        no_git: bool,
         #[arg(long)]
-        no_ols: Option<bool>,
+        no_ols: bool,
     },
     Build,
     Run,
@@ -34,11 +34,7 @@ impl Cli {
                     no_git,
                     no_ols,
                 } => {
-                    project_creator::create_project(
-                        &name,
-                        no_git.unwrap_or_default(),
-                        no_ols.unwrap_or_default(),
-                    );
+                    project_creator::create_project(&name, no_git, no_ols);
                 }
                 Commands::Build => println!("`build` is not supported yet"),
                 Commands::Run => println!("`run` is not supported yet"),
