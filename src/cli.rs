@@ -1,6 +1,9 @@
 use clap::{Parser, Subcommand};
 
-use crate::project_creator::{self, CreateProjectParams};
+use crate::{
+    project_buider,
+    project_creator::{self, CreateProjectParams},
+};
 
 #[derive(Parser)]
 #[command(version, about)]
@@ -31,6 +34,7 @@ enum Commands {
         #[arg(long, short)]
         release: bool,
     },
+    Clean,
 }
 
 impl Cli {
@@ -55,8 +59,9 @@ impl Cli {
                         no_workflows,
                     });
                 }
-                Commands::Build { release: _ } => println!("`build` is not supported yet"),
-                Commands::Run { release: _ } => println!("`run` is not supported yet"),
+                Commands::Build { release } => project_buider::build_project(release),
+                Commands::Run { release: _ } => todo!(),
+                Commands::Clean => project_buider::clean_project(),
             }
         }
     }
