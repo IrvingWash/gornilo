@@ -8,12 +8,54 @@ const GITIGNORE_ENTRIES: &'static str = r#"build
 .DS_Store
 "#;
 
+const MEM_TRACKING_CODE: &'static str = r#"	// =============================
+	// Memory tracking
+	// =============================
+	when ODIN_DEBUG {
+		context.logger = log.create_console_logger(lowest = log.Level.Debug)
+		defer log.destroy_console_logger(context.logger)
+
+		track: mem.Tracking_Allocator
+		mem.tracking_allocator_init(&track, context.allocator)
+		context.allocator = mem.tracking_allocator(&track)
+
+		defer {
+			if len(track.allocation_map) > 0 {
+				fmt.eprintf(
+					"=== %v allocations not freed: ===\n",
+					len(track.allocation_map),
+				)
+				for _, entry in track.allocation_map {
+					fmt.eprintf(
+						"- %v bytes @ %v\n",
+						entry.size,
+						entry.location,
+					)
+				}
+			}
+
+			if len(track.bad_free_array) > 0 {
+				fmt.eprintf(
+					"=== %v incorrect frees: ===\n",
+					len(track.bad_free_array),
+				)
+				for entry in track.bad_free_array {
+					fmt.eprintf("- %p @ %v\n", entry.memory, entry.location)
+				}
+			}
+
+			mem.tracking_allocator_destroy(&track)
+		}
+	}
+"#;
+
 const MAIN_FILE_CONTENTS: &'static str = r#"package main
 
 import "core:fmt"
 
 main :: proc() {
-    fmt.println("Hellope!")
+$mem_tracking$
+	fmt.println("Hellope!")
 }
 
 "#;
@@ -43,7 +85,7 @@ const ODINFMT_CONFING_CONTENTS: &'static str = r#"{
 }
 "#;
 
-pub fn create_project(name: &str, no_git: bool, no_ols: bool) {
+pub fn create_project(name: &str, no_git: bool, no_ols: bool, no_mem_tracking: bool) {
     println!("Creating project \"{}\"...", name);
 
     let project_dir_path = create_project_dir(name);
@@ -52,7 +94,7 @@ pub fn create_project(name: &str, no_git: bool, no_ols: bool) {
         init_git(&project_dir_path);
     }
 
-    create_project_structure(&project_dir_path, name, no_ols);
+    create_project_structure(&project_dir_path, name, no_ols, no_mem_tracking);
 
     println!("Finished");
 }
@@ -82,7 +124,12 @@ fn init_git(project_dir_path: &PathBuf) {
         .expect("Failed to write into .gitignore");
 }
 
-fn create_project_structure(project_dir_path: &PathBuf, project_name: &str, no_ols: bool) {
+fn create_project_structure(
+    project_dir_path: &PathBuf,
+    project_name: &str,
+    no_ols: bool,
+    no_mem_tracking: bool,
+) {
     // Main file
     {
         let src_path = project_dir_path.join("src");
@@ -92,8 +139,14 @@ fn create_project_structure(project_dir_path: &PathBuf, project_name: &str, no_o
         let mut main_file =
             File::create(src_path.join("main.odin")).expect("Failed to create main.odin file");
 
+        let src = if !no_mem_tracking {
+            MAIN_FILE_CONTENTS.replace("$mem_tracking$", MEM_TRACKING_CODE)
+        } else {
+            MAIN_FILE_CONTENTS.replace("$mem_tracking$", "")
+        };
+
         main_file
-            .write_all(MAIN_FILE_CONTENTS.as_bytes())
+            .write_all(src.as_bytes())
             .expect("Failed to write main file contents");
     }
 

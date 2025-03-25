@@ -18,9 +18,17 @@ enum Commands {
         no_git: bool,
         #[arg(long)]
         no_ols: bool,
+        #[arg(long)]
+        no_mem_tracking: bool,
     },
-    Build,
-    Run,
+    Build {
+        #[arg(long, short)]
+        release: bool,
+    },
+    Run {
+        #[arg(long, short)]
+        release: bool,
+    },
 }
 
 impl Cli {
@@ -33,11 +41,12 @@ impl Cli {
                     name,
                     no_git,
                     no_ols,
+                    no_mem_tracking,
                 } => {
-                    project_creator::create_project(&name, no_git, no_ols);
+                    project_creator::create_project(&name, no_git, no_ols, no_mem_tracking);
                 }
-                Commands::Build => println!("`build` is not supported yet"),
-                Commands::Run => println!("`run` is not supported yet"),
+                Commands::Build { release: _ } => println!("`build` is not supported yet"),
+                Commands::Run { release: _ } => println!("`run` is not supported yet"),
             }
         }
     }
