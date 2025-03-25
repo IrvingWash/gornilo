@@ -22,6 +22,7 @@ pub struct CreateProjectParams {
     pub no_workflows: bool,
 }
 
+#[inline]
 pub fn create_project(params: CreateProjectParams) {
     let CreateProjectParams {
         name,

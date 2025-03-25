@@ -3,6 +3,49 @@ name = "gornilo"
 version = "0.1.0"
 edition = "2024"
 description = "Odin build tool"
+exclude = [".github", ".git"]
+publish = true
+homepage = "https://github.com/IrvingWash/gornilo"
+repository = "https://github.com/IrvingWash/gornilo.git"
+readme = "README.md"
+documentation = "https://github.com/IrvingWash/gornilo"
+license = "MIT"
+authors = ["WI"]
+keywords = ["odin", "build", "tools"]
+categories = ["build-tools"]
+
+[lints.clippy]
+needless_pass_by_ref_mut = "deny"
+needless_pass_by_value = "deny"
+absolute_paths = "deny"
+absurd_extreme_comparisons = "deny"
+assertions_on_result_states = "deny"
+cast_lossless = "deny"
+clear_with_drain = "deny"
+clone_on_ref_ptr = "deny"
+cognitive_complexity = "deny"
+collection_is_never_read = "deny"
+dbg_macro = "deny"
+default_trait_access = "deny"
+equatable_if_let = "deny"
+explicit_into_iter_loop = "deny"
+fallible_impl_from = "deny"
+float_cmp = "deny"
+implicit_clone = "deny"
+iter_filter_is_ok = "deny"
+iter_filter_is_some = "deny"
+iter_with_drain = "deny"
+large_types_passed_by_value = "deny"
+manual_is_variant_and = "deny"
+manual_let_else = "deny"
+manual_ok_or = "deny"
+manual_string_new = "deny"
+or_fun_call = "deny"
+redundant_else = "deny"
+set_contains_or_insert = "deny"
+type_id_on_box = "deny"
+unnecessary_self_imports = "deny"
+missing_inline_in_public_items = "deny"
 
 [dependencies]
 clap = { version = "4.5.32", features = ["derive"] }

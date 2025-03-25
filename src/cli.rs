@@ -34,6 +34,7 @@ enum Commands {
 }
 
 impl Cli {
+    #[inline]
     pub fn run() {
         let args = Cli::parse();
 
