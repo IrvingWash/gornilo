@@ -1,6 +1,6 @@
 # 🔥 GORNILO 🔥
 
-## GORNILO is a build tool for [Odin](odin-lang.org) projects
+## GORNILO is a build tool for [Odin](https://odin-lang.org) projects
 
 ## Installation
 ```bash
