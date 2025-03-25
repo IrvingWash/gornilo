@@ -6,7 +6,7 @@ use std::{
 use crate::helpers;
 
 #[inline]
-pub fn build_project(release: bool) {
+pub fn build_project(release: bool, run: bool) {
     if !helpers::is_in_project_dir() {
         eprintln!("The build command should be called from the project's root");
         process::exit(1);
@@ -21,7 +21,9 @@ pub fn build_project(release: bool) {
 
     let mut odin_command = Command::new("odin");
 
-    odin_command.arg("build").arg(souce_dir);
+    odin_command
+        .arg(if run { "run" } else { "build" })
+        .arg(souce_dir);
 
     if !release {
         odin_command.arg("-debug");
@@ -32,6 +34,8 @@ pub fn build_project(release: bool) {
     let build_file = build_dir.join("exe.out");
 
     odin_command.arg(format!("-out:{}", build_file.to_str().unwrap()));
+
+    println!("{:?}", odin_command);
 
     odin_command.output().unwrap();
 }

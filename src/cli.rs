@@ -29,10 +29,14 @@ enum Commands {
     Build {
         #[arg(long, short)]
         release: bool,
+        #[arg(long, short)]
+        example: Option<String>,
     },
     Run {
         #[arg(long, short)]
         release: bool,
+        #[arg(long, short)]
+        example: Option<String>,
     },
     Clean,
 }
@@ -59,8 +63,14 @@ impl Cli {
                         no_workflows,
                     });
                 }
-                Commands::Build { release } => project_buider::build_project(release),
-                Commands::Run { release: _ } => todo!(),
+                Commands::Build {
+                    release,
+                    example: _,
+                } => project_buider::build_project(release, false),
+                Commands::Run {
+                    release,
+                    example: _,
+                } => project_buider::build_project(release, true),
                 Commands::Clean => project_buider::clean_project(),
             }
         }
