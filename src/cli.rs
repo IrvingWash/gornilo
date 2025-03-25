@@ -10,9 +10,6 @@ use crate::{
 pub struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
-
-    #[arg(long, short)]
-    verbose: bool,
 }
 
 #[derive(Subcommand)]
