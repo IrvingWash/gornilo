@@ -1,9 +1,10 @@
-use std::fs::{File, create_dir_all};
+use std::fs::File;
 use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
 use std::{env, fs};
 
+mod github_workflow_generator;
 mod gitignore_generator;
 mod odin_code_generator;
 mod ols_config_generator;
@@ -18,6 +19,7 @@ pub struct CreateProjectParams {
     pub no_git: bool,
     pub no_ols: bool,
     pub no_mem_tracking: bool,
+    pub no_workflows: bool,
 }
 
 pub fn create_project(params: CreateProjectParams) {
@@ -26,6 +28,7 @@ pub fn create_project(params: CreateProjectParams) {
         no_mem_tracking,
         no_git,
         no_ols,
+        no_workflows,
     } = params;
 
     println!("Creating project \"{}\"...", name);
@@ -36,7 +39,13 @@ pub fn create_project(params: CreateProjectParams) {
         init_git(&project_dir_path);
     }
 
-    create_project_structure(&project_dir_path, &name, no_ols, no_mem_tracking);
+    create_project_structure(
+        &project_dir_path,
+        &name,
+        no_ols,
+        no_mem_tracking,
+        no_workflows,
+    );
 
     println!("Finished");
 }
@@ -71,12 +80,13 @@ fn create_project_structure(
     project_name: &str,
     no_ols: bool,
     no_mem_tracking: bool,
+    no_workflows: bool,
 ) {
     // Main file
     {
         let src_path = project_dir_path.join("src");
 
-        create_dir_all(&src_path).expect("Failed to create src directory");
+        fs::create_dir_all(&src_path).expect("Failed to create src directory");
 
         let mut main_file =
             File::create(src_path.join("main.odin")).expect("Failed to create main.odin file");
@@ -125,5 +135,19 @@ fn create_project_structure(
                 .write_all(ols_config_generator::ODINFMT_CONFING_CONTENTS.as_bytes())
                 .expect("Failed to write Odin Format config contents");
         }
+    }
+
+    // Github Workflows
+    if !no_workflows {
+        let workflows_path = project_dir_path.join(".github/workflows");
+
+        fs::create_dir_all(&workflows_path).expect("Failed to create Github Workflows dir");
+
+        let mut odin_workflow_path = File::create(workflows_path.join("odin.yml"))
+            .expect("Failed to create Odin workflow file");
+
+        odin_workflow_path
+            .write_all(github_workflow_generator::GITHUB_WORKFLOW_CONTENTS.as_bytes())
+            .expect("Failed to write Odin Workflow contents");
     }
 }

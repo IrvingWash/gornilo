@@ -20,6 +20,8 @@ enum Commands {
         no_ols: bool,
         #[arg(long)]
         no_mem_tracking: bool,
+        #[arg(long)]
+        no_workflows: bool,
     },
     Build {
         #[arg(long, short)]
@@ -42,12 +44,14 @@ impl Cli {
                     no_git,
                     no_ols,
                     no_mem_tracking,
+                    no_workflows,
                 } => {
                     project_creator::create_project(CreateProjectParams {
                         name,
                         no_ols,
                         no_git,
                         no_mem_tracking,
+                        no_workflows,
                     });
                 }
                 Commands::Build { release: _ } => println!("`build` is not supported yet"),
