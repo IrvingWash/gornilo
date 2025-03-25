@@ -20,7 +20,7 @@ main :: proc() {
 
 // TODO: replace with a proper config generator
 const GORNILO_CONFIG_CONTENTS: &'static str = r#"[project]
-name = $project_name$
+name = "$project_name$"
 "#;
 
 const OLS_CONFING_CONTENTS: &'static str = r#"{
