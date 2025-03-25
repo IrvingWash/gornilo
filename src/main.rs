@@ -1,3 +1,5 @@
+use gornilo::Cli;
+
 fn main() {
-    println!("Hello, world!");
+    Cli::run();
 }
