@@ -1,6 +1,6 @@
 use clap::{Parser, Subcommand};
 
-use crate::project_creator;
+use crate::project_creator::{self, CreateProjectParams};
 
 #[derive(Parser)]
 #[command(version, about)]
@@ -43,7 +43,12 @@ impl Cli {
                     no_ols,
                     no_mem_tracking,
                 } => {
-                    project_creator::create_project(&name, no_git, no_ols, no_mem_tracking);
+                    project_creator::create_project(CreateProjectParams {
+                        name,
+                        no_ols,
+                        no_git,
+                        no_mem_tracking,
+                    });
                 }
                 Commands::Build { release: _ } => println!("`build` is not supported yet"),
                 Commands::Run { release: _ } => println!("`run` is not supported yet"),

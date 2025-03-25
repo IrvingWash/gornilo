@@ -4,97 +4,39 @@ use std::path::PathBuf;
 use std::process::Command;
 use std::{env, fs};
 
-const GITIGNORE_ENTRIES: &'static str = r#"build
-.DS_Store
-"#;
-
-const MEM_TRACKING_CODE: &'static str = r#"	// =============================
-	// Memory tracking
-	// =============================
-	when ODIN_DEBUG {
-		context.logger = log.create_console_logger(lowest = log.Level.Debug)
-		defer log.destroy_console_logger(context.logger)
-
-		track: mem.Tracking_Allocator
-		mem.tracking_allocator_init(&track, context.allocator)
-		context.allocator = mem.tracking_allocator(&track)
-
-		defer {
-			if len(track.allocation_map) > 0 {
-				fmt.eprintf(
-					"=== %v allocations not freed: ===\n",
-					len(track.allocation_map),
-				)
-				for _, entry in track.allocation_map {
-					fmt.eprintf(
-						"- %v bytes @ %v\n",
-						entry.size,
-						entry.location,
-					)
-				}
-			}
-
-			if len(track.bad_free_array) > 0 {
-				fmt.eprintf(
-					"=== %v incorrect frees: ===\n",
-					len(track.bad_free_array),
-				)
-				for entry in track.bad_free_array {
-					fmt.eprintf("- %p @ %v\n", entry.memory, entry.location)
-				}
-			}
-
-			mem.tracking_allocator_destroy(&track)
-		}
-	}
-"#;
-
-const MAIN_FILE_CONTENTS: &'static str = r#"package main
-
-import "core:fmt"
-
-main :: proc() {
-$mem_tracking$
-	fmt.println("Hellope!")
-}
-
-"#;
+mod gitignore_generator;
+mod odin_code_generator;
+mod ols_config_generator;
 
 // TODO: replace with a proper config generator
 const GORNILO_CONFIG_CONTENTS: &'static str = r#"[project]
 name = "$project_name$"
 "#;
 
-const OLS_CONFING_CONTENTS: &'static str = r#"{
-	"$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/misc/ols.schema.json",
-	"enable_format": true,
-	"enable_semantic_tokens": true,
-	"enable_document_symbols": true,
-	"enable_hover": true,
-	"enable_snippets": true
+pub struct CreateProjectParams {
+    pub name: String,
+    pub no_git: bool,
+    pub no_ols: bool,
+    pub no_mem_tracking: bool,
 }
-"#;
 
-const ODINFMT_CONFING_CONTENTS: &'static str = r#"{
-	"$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/misc/odinfmt.schema.json",
-	"character_width": 80,
-	"newline_limit": 1,
-	"tabs": true,
-	"tabs_width": 4
-	"sort_imports": false,
-}
-"#;
+pub fn create_project(params: CreateProjectParams) {
+    let CreateProjectParams {
+        name,
+        no_mem_tracking,
+        no_git,
+        no_ols,
+    } = params;
 
-pub fn create_project(name: &str, no_git: bool, no_ols: bool, no_mem_tracking: bool) {
     println!("Creating project \"{}\"...", name);
 
-    let project_dir_path = create_project_dir(name);
+    let project_dir_path = create_project_dir(&name);
 
     if !no_git {
         init_git(&project_dir_path);
     }
 
-    create_project_structure(&project_dir_path, name, no_ols, no_mem_tracking);
+    create_project_structure(&project_dir_path, &name, no_ols, no_mem_tracking);
 
     println!("Finished");
 }
@@ -120,7 +62,7 @@ fn init_git(project_dir_path: &PathBuf) {
 
     let mut file = File::create(gitignore_path).expect("Failed to create .gitignore");
 
-    file.write_all(GITIGNORE_ENTRIES.as_bytes())
+    file.write_all(gitignore_generator::GITIGNORE_CONTENTS.as_bytes())
         .expect("Failed to write into .gitignore");
 }
 
@@ -139,14 +81,12 @@ fn create_project_structure(
         let mut main_file =
             File::create(src_path.join("main.odin")).expect("Failed to create main.odin file");
 
-        let src = if !no_mem_tracking {
-            MAIN_FILE_CONTENTS.replace("$mem_tracking$", MEM_TRACKING_CODE)
-        } else {
-            MAIN_FILE_CONTENTS.replace("$mem_tracking$", "")
-        };
-
         main_file
-            .write_all(src.as_bytes())
+            .write_all(if no_mem_tracking {
+                odin_code_generator::BASIC_CODE.as_bytes()
+            } else {
+                odin_code_generator::MEM_TRACKING_CODE.as_bytes()
+            })
             .expect("Failed to write main file contents");
     }
 
@@ -172,7 +112,7 @@ fn create_project_structure(
                 .expect("Failed to create OLS confing file");
 
             ols_file
-                .write_all(OLS_CONFING_CONTENTS.as_bytes())
+                .write_all(ols_config_generator::OLS_CONFING_CONTENTS.as_bytes())
                 .expect("Failed to write OLS config contents");
         }
 
@@ -182,7 +122,7 @@ fn create_project_structure(
                 .expect("Failed to create Odin Format config file");
 
             odinfmt_file
-                .write_all(ODINFMT_CONFING_CONTENTS.as_bytes())
+                .write_all(ols_config_generator::ODINFMT_CONFING_CONTENTS.as_bytes())
                 .expect("Failed to write Odin Format config contents");
         }
     }
