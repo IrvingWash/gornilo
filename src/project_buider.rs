@@ -3,7 +3,10 @@ use std::{
     process::{self, Command},
 };
 
-use crate::{gornilo_config::GorniloConfig, helpers};
+use crate::{
+    gornilo_config::{GorniloConfig, VetFlagsConfig},
+    helpers,
+};
 
 #[inline]
 pub fn build_project(release: bool, run: bool, config: GorniloConfig) {
@@ -25,27 +28,7 @@ pub fn build_project(release: bool, run: bool, config: GorniloConfig) {
         .arg(if run { "run" } else { "build" })
         .arg(souce_dir);
 
-    if config.vet_flags.warnings_as_errors {
-        odin_command.arg("-warnings-as-errors");
-    }
-    if config.vet_flags.unused_variables {
-        odin_command.arg("-vet-unused-variables");
-    }
-    if config.vet_flags.unused_imports {
-        odin_command.arg("-vet-unused-imports");
-    }
-    if config.vet_flags.tabs {
-        odin_command.arg("-vet-tabs");
-    }
-    if config.vet_flags.style {
-        odin_command.arg("-vet-style");
-    }
-    if config.vet_flags.semicolon {
-        odin_command.arg("-vet-semicolon");
-    }
-    if config.vet_flags.cast {
-        odin_command.arg("-vet-cast");
-    }
+    add_vet_flags(&mut odin_command, &config.vet_flags);
 
     if !release {
         odin_command.arg("-debug");
@@ -59,7 +42,9 @@ pub fn build_project(release: bool, run: bool, config: GorniloConfig) {
 
     println!("{:?}", odin_command);
 
-    odin_command.output().unwrap();
+    odin_command
+        .output()
+        .expect("Failed to execute Odin command");
 }
 
 #[inline]
@@ -74,4 +59,28 @@ pub fn clean_project() {
         .join("build");
 
     fs::remove_dir_all(build_dir).expect("Failed to remove build directory");
+}
+
+fn add_vet_flags(command: &mut Command, vet_flags: &VetFlagsConfig) {
+    if vet_flags.warnings_as_errors {
+        command.arg("-warnings-as-errors");
+    }
+    if vet_flags.unused_variables {
+        command.arg("-vet-unused-variables");
+    }
+    if vet_flags.unused_imports {
+        command.arg("-vet-unused-imports");
+    }
+    if vet_flags.tabs {
+        command.arg("-vet-tabs");
+    }
+    if vet_flags.style {
+        command.arg("-vet-style");
+    }
+    if vet_flags.semicolon {
+        command.arg("-vet-semicolon");
+    }
+    if vet_flags.cast {
+        command.arg("-vet-cast");
+    }
 }
