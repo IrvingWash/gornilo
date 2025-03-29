@@ -46,6 +46,7 @@ cast = true
 ## Todo
 - [ ] Retain `odin build`'s output formatting
 - [ ] Add ability to build and run examples
+- [ ] Add ability to run tests
 
 ## Why Rust?
 I wanted to implement GORNILO in Odin, but Odin's standard library has a very poor support for executing command line commands.

@@ -11,7 +11,7 @@ readme = "README.md"
 documentation = "https://github.com/IrvingWash/gornilo"
 license = "MIT"
 authors = ["WI"]
-keywords = ["odin", "project management"]
+keywords = ["odin", "project-management"]
 categories = ["development-tools::build-utils", "command-line-utilities"]
 
 [lints.clippy]
