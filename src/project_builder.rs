@@ -42,9 +42,21 @@ pub fn build_project(release: bool, run: bool, config: GorniloConfig) {
 
     println!("{:?}", odin_command);
 
-    odin_command
+    let output = odin_command
         .output()
         .expect("Failed to execute Odin command");
+
+    if output.status.success() {
+        print!(
+            "{}",
+            String::from_utf8(output.stdout).expect("Failed to get stdout of Odin build command")
+        );
+    } else {
+        eprint!(
+            "{}",
+            String::from_utf8(output.stderr).expect("Failed to get stderr of Odin build command")
+        );
+    }
 }
 
 #[inline]

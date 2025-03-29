@@ -59,11 +59,20 @@ fn create_project_dir(name: &str) -> PathBuf {
 }
 
 fn init_git(project_dir_path: &PathBuf) {
-    Command::new("git")
+    let output = Command::new("git")
         .arg("init")
         .arg(project_dir_path)
         .output()
         .expect("Failed to initialize a git repository");
+
+    if !output.status.success() {
+        eprint!(
+            "{}",
+            String::from_utf8(output.stderr).expect(
+                "Failed to get stderr after failed attempt to initialize the git repository"
+            )
+        );
+    }
 
     let gitignore_path = project_dir_path.join(".gitignore");
 
