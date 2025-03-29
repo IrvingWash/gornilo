@@ -2,7 +2,7 @@
 name = "gornilo"
 version = "0.1.0"
 edition = "2024"
-description = "Odin build tool"
+description = "Odin project manager"
 exclude = [".github", ".git"]
 publish = true
 homepage = "https://github.com/IrvingWash/gornilo"
@@ -11,8 +11,8 @@ readme = "README.md"
 documentation = "https://github.com/IrvingWash/gornilo"
 license = "MIT"
 authors = ["WI"]
-keywords = ["odin", "build", "tools"]
-categories = ["build-tools"]
+keywords = ["odin", "project management"]
+categories = ["development-tools::build-utils", "command-line-utilities"]
 
 [lints.clippy]
 needless_pass_by_ref_mut = "deny"
