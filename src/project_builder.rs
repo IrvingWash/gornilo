@@ -1,5 +1,7 @@
 use std::{
+    collections::HashMap,
     env, fs,
+    path::PathBuf,
     process::{self, Command},
 };
 
@@ -15,34 +17,7 @@ pub fn build_project(release: bool, run: bool, example: &Option<String>, config:
         process::exit(1);
     }
 
-    let project_dir = env::current_dir().expect("Failed to get the project directory");
-
-    let (souce_dir, build_dir) = match example {
-        None => (
-            project_dir.join("src"),
-            if release {
-                project_dir.join("build").join("release")
-            } else {
-                project_dir.join("build").join("debug")
-            },
-        ),
-        Some(example) => (
-            project_dir.join("examples").join(example).join("src"),
-            if release {
-                project_dir
-                    .join("build")
-                    .join("examples")
-                    .join(example)
-                    .join("release")
-            } else {
-                project_dir
-                    .join("build")
-                    .join("examples")
-                    .join(example)
-                    .join("debug")
-            },
-        ),
-    };
+    let (souce_dir, build_dir) = make_souce_and_build_dirs(example, release);
 
     fs::create_dir_all(&build_dir).expect("Failed to create build directory");
 
@@ -63,6 +38,8 @@ pub fn build_project(release: bool, run: bool, example: &Option<String>, config:
     let build_file = build_dir.join(config.project.name);
 
     odin_command.arg(format!("-out:{}", build_file.to_str().unwrap()));
+
+    add_collections(&mut odin_command, &config.collections);
 
     println!("{:?}", odin_command);
 
@@ -95,6 +72,43 @@ pub fn clean_project() {
         .join("build");
 
     fs::remove_dir_all(build_dir).expect("Failed to remove build directory");
+}
+
+fn make_souce_and_build_dirs(example: &Option<String>, release: bool) -> (PathBuf, PathBuf) {
+    let project_dir = env::current_dir().expect("Failed to get the project directory");
+
+    match example {
+        None => (
+            project_dir.join("src"),
+            if release {
+                project_dir.join("build").join("release")
+            } else {
+                project_dir.join("build").join("debug")
+            },
+        ),
+        Some(example) => (
+            project_dir.join("examples").join(example).join("src"),
+            if release {
+                project_dir
+                    .join("build")
+                    .join("examples")
+                    .join(example)
+                    .join("release")
+            } else {
+                project_dir
+                    .join("build")
+                    .join("examples")
+                    .join(example)
+                    .join("debug")
+            },
+        ),
+    }
+}
+
+fn add_collections(command: &mut Command, collections: &HashMap<String, String>) {
+    for (name, path) in collections {
+        command.arg(format!("-collection:{name}={path}"));
+    }
 }
 
 fn add_vet_flags(command: &mut Command, vet_flags: &VetFlagsConfig) {

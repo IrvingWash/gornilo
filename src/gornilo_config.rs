@@ -1,4 +1,4 @@
-use std::{env, fs::File, io::Read};
+use std::{collections::HashMap, env, fs::File, io::Read};
 
 use serde::{Deserialize, Serialize};
 
@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct GorniloConfig {
     pub project: ProjectConfig,
     pub vet_flags: VetFlagsConfig,
+    pub collections: HashMap<String, String>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -40,6 +41,7 @@ impl GorniloConfig {
                 unused_variables: true,
                 warnings_as_errors: true,
             },
+            collections: HashMap::new(),
         }
     }
 }

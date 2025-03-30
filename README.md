@@ -46,6 +46,9 @@ tabs = true
 style = true
 semicolon = true
 cast = true
+
+[collections]
+my_collection = "./my_collection"
 ```
 
 ## Examples
