@@ -21,6 +21,11 @@ gornilo build --release
 gornilo run --release
 ```
 
+### Run an example
+```bash
+gornilo run --release --example my_example
+```
+
 ### Clean temporary files
 ```bash
 gornilo clean
@@ -43,10 +48,19 @@ semicolon = true
 cast = true
 ```
 
+## Examples
+Examples should have the following structure:
+```
+my_project
+├── examples
+│   └── my_example
+│       └── src
+│           └── main.odin
+```
+
 ## Todo
-- [ ] Retain `odin build`'s output formatting
-- [ ] Add ability to build and run examples
-- [ ] Add ability to run tests
+- Retain `odin build`'s output formatting
+- Add ability to run tests
 
 ## Why Rust?
 I wanted to implement GORNILO in Odin, but Odin's standard library has a very poor support for executing command line commands.

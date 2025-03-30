@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[inline]
-pub fn build_project(release: bool, run: bool, config: GorniloConfig) {
+pub fn build_project(release: bool, run: bool, example: &Option<String>, config: GorniloConfig) {
     if !helpers::is_in_project_dir() {
         eprintln!("The build command should be called from the project's root");
         process::exit(1);
@@ -17,8 +17,32 @@ pub fn build_project(release: bool, run: bool, config: GorniloConfig) {
 
     let project_dir = env::current_dir().expect("Failed to get the project directory");
 
-    let souce_dir = project_dir.join("src");
-    let build_dir = project_dir.join("build");
+    let (souce_dir, build_dir) = match example {
+        None => (
+            project_dir.join("src"),
+            if release {
+                project_dir.join("build").join("release")
+            } else {
+                project_dir.join("build").join("debug")
+            },
+        ),
+        Some(example) => (
+            project_dir.join("examples").join(example).join("src"),
+            if release {
+                project_dir
+                    .join("build")
+                    .join("examples")
+                    .join(example)
+                    .join("release")
+            } else {
+                project_dir
+                    .join("build")
+                    .join("examples")
+                    .join(example)
+                    .join("debug")
+            },
+        ),
+    };
 
     fs::create_dir_all(&build_dir).expect("Failed to create build directory");
 

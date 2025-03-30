@@ -63,19 +63,13 @@ impl Cli {
                         no_workflows,
                     });
                 }
-                Commands::Build {
-                    release,
-                    example: _,
-                } => {
+                Commands::Build { release, example } => {
                     let config = gornilo_config::parse_config();
-                    project_builder::build_project(release, false, config);
+                    project_builder::build_project(release, false, &example, config);
                 }
-                Commands::Run {
-                    release,
-                    example: _,
-                } => {
+                Commands::Run { release, example } => {
                     let config = gornilo_config::parse_config();
-                    project_builder::build_project(release, true, config);
+                    project_builder::build_project(release, true, &example, config);
                 }
                 Commands::Clean => project_builder::clean_project(),
             }
