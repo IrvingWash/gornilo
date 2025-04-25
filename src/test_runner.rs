@@ -1,5 +1,5 @@
 use std::{
-    env,
+    env, fs,
     path::PathBuf,
     process::{self, Command},
 };
@@ -13,7 +13,9 @@ pub fn run_tests(source_path: Option<String>, all_packages: bool, config: &Gorni
         process::exit(1);
     }
 
-    let (source_dir, build_path) = make_source_and_build_paths(source_path, config);
+    let (source_dir, build_dir) = make_source_and_build_dirs(source_path, config);
+
+    fs::create_dir_all(&build_dir).expect("Failed to create build directory");
 
     let mut odin_command = Command::new("odin");
 
@@ -23,7 +25,7 @@ pub fn run_tests(source_path: Option<String>, all_packages: bool, config: &Gorni
         odin_command.arg("--all-packages");
     }
 
-    odin_command.arg(format!("-out:{}", build_path.to_str().unwrap()));
+    odin_command.arg(format!("-out:{}", build_dir.join("test").to_str().unwrap()));
 
     helpers::add_vet_flags(&mut odin_command, &config.vet_flags);
     helpers::add_collections(&mut odin_command, &config.collections);
@@ -47,7 +49,7 @@ pub fn run_tests(source_path: Option<String>, all_packages: bool, config: &Gorni
     }
 }
 
-fn make_source_and_build_paths(
+fn make_source_and_build_dirs(
     source_path: Option<String>,
     config: &GorniloConfig,
 ) -> (PathBuf, PathBuf) {
@@ -68,7 +70,7 @@ fn make_source_and_build_paths(
 
     let source_dir = current_dir.join(source_path);
 
-    let build_path = current_dir.join("build").join("tests").join("test");
+    let build_dir = current_dir.join("build").join("tests");
 
-    (source_dir, build_path)
+    (source_dir, build_dir)
 }
