@@ -31,6 +31,9 @@ gornilo run --release --example my_example
 gornilo clean
 ```
 
+### Run tests
+gornilo test ./tests --all-packages
+
 ## Configuration
 GORNILO has a configuration file `gornilo.toml` which is created in the project's root.<br>
 Available options:<br>
@@ -49,6 +52,10 @@ cast = true
 
 [collections]
 my_collection = "./my_collection"
+
+[testing]
+source_path = "tests"
+all_packages = true
 ```
 
 ## Examples
