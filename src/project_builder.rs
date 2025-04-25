@@ -1,17 +1,13 @@
 use std::{
-    collections::HashMap,
     env, fs,
     path::PathBuf,
     process::{self, Command},
 };
 
-use crate::{
-    gornilo_config::{GorniloConfig, VetFlagsConfig},
-    helpers,
-};
+use crate::{gornilo_config::GorniloConfig, helpers};
 
 #[inline]
-pub fn build_project(release: bool, run: bool, example: &Option<String>, config: GorniloConfig) {
+pub fn build_project(release: bool, run: bool, example: &Option<String>, config: &GorniloConfig) {
     if !helpers::is_in_project_dir() {
         eprintln!("The build command should be called from the project's root");
         process::exit(1);
@@ -27,7 +23,7 @@ pub fn build_project(release: bool, run: bool, example: &Option<String>, config:
         .arg(if run { "run" } else { "build" })
         .arg(souce_dir);
 
-    add_vet_flags(&mut odin_command, &config.vet_flags);
+    helpers::add_vet_flags(&mut odin_command, &config.vet_flags);
 
     if !release {
         odin_command.arg("-debug");
@@ -35,11 +31,11 @@ pub fn build_project(release: bool, run: bool, example: &Option<String>, config:
         odin_command.arg("-no-bounds-check").arg("-o:speed");
     }
 
-    let build_file = build_dir.join(config.project.name);
+    let build_file = build_dir.join(config.project.name.clone());
 
     odin_command.arg(format!("-out:{}", build_file.to_str().unwrap()));
 
-    add_collections(&mut odin_command, &config.collections);
+    helpers::add_collections(&mut odin_command, &config.collections);
 
     println!("{:?}", odin_command);
 
@@ -102,35 +98,5 @@ fn make_souce_and_build_dirs(example: &Option<String>, release: bool) -> (PathBu
                     .join("debug")
             },
         ),
-    }
-}
-
-fn add_collections(command: &mut Command, collections: &HashMap<String, String>) {
-    for (name, path) in collections {
-        command.arg(format!("-collection:{name}={path}"));
-    }
-}
-
-fn add_vet_flags(command: &mut Command, vet_flags: &VetFlagsConfig) {
-    if vet_flags.warnings_as_errors {
-        command.arg("-warnings-as-errors");
-    }
-    if vet_flags.unused_variables {
-        command.arg("-vet-unused-variables");
-    }
-    if vet_flags.unused_imports {
-        command.arg("-vet-unused-imports");
-    }
-    if vet_flags.tabs {
-        command.arg("-vet-tabs");
-    }
-    if vet_flags.style {
-        command.arg("-vet-style");
-    }
-    if vet_flags.semicolon {
-        command.arg("-vet-semicolon");
-    }
-    if vet_flags.cast {
-        command.arg("-vet-cast");
     }
 }

@@ -7,6 +7,7 @@ pub struct GorniloConfig {
     pub project: ProjectConfig,
     pub vet_flags: VetFlagsConfig,
     pub collections: HashMap<String, String>,
+    pub testing: TestingConfig,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -23,6 +24,12 @@ pub struct VetFlagsConfig {
     pub style: bool,
     pub semicolon: bool,
     pub cast: bool,
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct TestingConfig {
+    pub source_path: Option<String>,
+    pub all_packages: bool,
 }
 
 impl GorniloConfig {
@@ -42,6 +49,10 @@ impl GorniloConfig {
                 warnings_as_errors: true,
             },
             collections: HashMap::new(),
+            testing: TestingConfig {
+                source_path: None,
+                all_packages: false,
+            },
         }
     }
 }

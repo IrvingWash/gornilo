@@ -3,6 +3,7 @@ use clap::{Parser, Subcommand};
 use crate::{
     gornilo_config, project_builder,
     project_creator::{self, CreateProjectParams},
+    test_runner,
 };
 
 #[derive(Parser)]
@@ -39,6 +40,12 @@ enum Commands {
         example: Option<String>,
     },
     Clean,
+    Test {
+        #[arg(long, short)]
+        source_path: Option<String>,
+        #[arg(long, short)]
+        all_packages: bool,
+    },
 }
 
 impl Cli {
@@ -65,13 +72,20 @@ impl Cli {
                 }
                 Commands::Build { release, example } => {
                     let config = gornilo_config::parse_config();
-                    project_builder::build_project(release, false, &example, config);
+                    project_builder::build_project(release, false, &example, &config);
                 }
                 Commands::Run { release, example } => {
                     let config = gornilo_config::parse_config();
-                    project_builder::build_project(release, true, &example, config);
+                    project_builder::build_project(release, true, &example, &config);
                 }
                 Commands::Clean => project_builder::clean_project(),
+                Commands::Test {
+                    source_path,
+                    all_packages,
+                } => {
+                    let config = gornilo_config::parse_config();
+                    test_runner::run_tests(source_path, all_packages, &config);
+                }
             }
         }
     }
