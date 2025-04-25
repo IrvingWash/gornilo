@@ -21,7 +21,7 @@ pub fn run_tests(source_path: Option<String>, all_packages: bool, config: &Gorni
 
     odin_command.arg("test").arg(source_dir);
 
-    if all_packages {
+    if all_packages || config.testing.all_packages {
         odin_command.arg("--all-packages");
     }
 
